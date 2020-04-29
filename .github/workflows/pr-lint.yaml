@@ -1,0 +1,48 @@
+name: Pull Request Lint
+
+on:
+  pull_request:
+    branches:
+      - master
+    # types: [opened, reopened, synchronize]  # default types used
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  pr-lint:
+    name: Pull Request Lint
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@master
+      - name: Lint Pull Request
+        uses: pataraco/pr-lint-action@v0.1.3
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          # If PR Title contains:
+          lint-body-if-pr-title-has-regex: '(Feature|Hotfix|Bugfix)'
+          # Then PR Body should contain:
+          pr-body-regex: '(\[JIRA-\d+\])\((https?:\/\/company.atlassian.net)\/(browse\/JIRA-\d+)\)'
+          # The PR title should match:
+          pr-title-regex: '^(\[(Feature|Hotfix|Bugfix)\] JIRA-(\d+)|\[(Chore|Release)\])'
+          pr-body-regex-failed-comment: |
+            The Pull Request is a Feature, Hotfix or Bugfix
+
+            Need to include the JIRA ticket reference link in the desciption of
+            the Pull Request.
+
+            - e.g. [JIRA-1234](company.atlassian.net/browse/JIRA-1234)
+          pr-title-regex-failed-comment: |
+            👎 The Pull Request title fails this RegEx expression!
+
+            - `%regex%`
+
+            <details>
+            <summary>
+            Here are some accepted PR title examples (Click to expand)...
+            </summary>
+
+            - [Feature] JIRA-XXXX Lorem Ipsum
+            - [Hotfix] JIRA-XXXX Lorem Ipsum
+            - [Bugfix] JIRA-XXXX Lorem Ipsum
+            - [Chore] Lorem Ipsum
+            - [Release] Lorem Ipsum
+            </details>

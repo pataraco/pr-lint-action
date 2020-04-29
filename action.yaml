@@ -1,0 +1,65 @@
+name: Pull Request Linter
+description: GitHub action to ensures a PR meets specific requirements
+author: Patrick Raco
+branding:
+  icon: check
+  color: green
+inputs:
+  github-token:
+    # should be able to use "${{ secrets.GITHUB_TOKEN }}"
+    # which is automatically set by GitHub
+    description: >-
+      GitHub OAuth/Personal Access Token of user with access to the repo.
+    required: true
+  lint-body-if-pr-title-has-regex:
+    description: >-
+      Regex to search the PR title for. If there is a match, then searches the
+      PR body for a required regex specified by pr-body-regex.
+    required: true
+    default: "Not provided - do NOT lint PR body"
+  pr-body-regex:
+    description: >-
+      Regex to ensure PR body matches. Must set lint-body-if-pr-title-has-regex.
+      Allows anything by default.
+    required: true
+    default: ".*"
+  pr-title-regex:
+    description: >-
+      Regex to ensure PR title matches. Allows anything by default.
+    required: true
+    default: ".*"
+  pr-body-regex-failed-comment:
+    description: >-
+      Comment for the bot to create a review requesting changes for PRs in 
+      which the PR body fails the regex check.
+      Use %regex% to reference regex.
+    required: true
+    default: "👎 PR body failed to match: %regex%"
+  pr-body-regex-passed-comment:
+    description: >-
+      Comment for the bot to create a review approving the PR if/when the
+      PR body passes the regex check.
+      Use %regex% to reference regex.
+    required: true
+    default: "👍 PR body looks good to me!"
+  pr-title-regex-failed-comment:
+    description: >-
+      Comment for the bot to create a review requesting changes for PRs in 
+      which the PR title fails the regex check.
+      Use %regex% to reference regex.
+    required: true
+    default: "👎 PR title failed to match: %regex%"
+  pr-title-regex-passed-comment:
+    description: >-
+      Comment for the bot to create a review approving the PR if/when the
+      PR title passes the regex check.
+      Use %regex% to reference regex.
+    required: true
+    default: "👍 PR title looks good to me!"
+runs:
+  using: node12
+  # main: index.js     # in order to use this you must push node_modules
+  # main: lib/main.js  # this also would most likely need node_modules
+  # even after running npm install, the runner could not
+  # find the modules
+  main: dist/index.js # uses @zeit/ncc (ncc build index.js)
